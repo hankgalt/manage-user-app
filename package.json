@@ -1,5 +1,5 @@
 {
-  "name": "list-app",
+  "name": "manage-user-app",
   "engines": {
     "node": "6.3.1"
   },
