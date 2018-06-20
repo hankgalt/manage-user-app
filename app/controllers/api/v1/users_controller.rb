@@ -1,5 +1,6 @@
 module Api::V1
   class UsersController < ApplicationController
+    before_action :authenticate_user
     before_action :set_user, only: [:show, :update, :destroy]
 
     # GET /users
@@ -19,7 +20,7 @@ module Api::V1
       @user = User.new(user_params)
 
       if @user.save
-        render json: @user, status: :created
+        render json: @user, status: :created, location: @user
       else
         render json: @user.errors, status: :unprocessable_entity
       end
@@ -27,6 +28,7 @@ module Api::V1
 
     # PATCH/PUT /users/1
     def update
+      @user = User.find(params[:id])
       if @user.update(user_params)
         render json: @user
       else
@@ -36,11 +38,17 @@ module Api::V1
 
     # DELETE /users/1
     def destroy
+      @user = User.find(params[:id])
       if @user.destroy
         head :no_content, status: :ok
       else
         render json: @user.errors, status: :unprocessable_entity
       end
+    end
+
+    def current
+      current_user.update!(last_login: Time.now)
+      render json: current_user
     end
 
     private
@@ -51,7 +59,11 @@ module Api::V1
 
       # Only allow a trusted parameter "white list" through.
       def user_params
-        params.require(:user).permit(:first_name, :last_name, :user_name, :password, :other_info)
+        params.require(:user).permit(:first_name, :last_name, :email, :password, :password_confirmation, :admin_user)
+      end
+
+      def authorize
+        return_unauthorized unless current_user && current_user.can_modify_user?(params[:id])
       end
   end
 end
