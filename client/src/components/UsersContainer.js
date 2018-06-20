@@ -19,31 +19,81 @@ class UsersContainer extends Component {
   }
 
   componentDidMount() {
-    axios.get('api/v1/users.json')
-    .then(response => {
-      console.log(response)
-      this.setState({
-          users: response.data
+    console.log("componentDidMount()")
+    let self = this;
+
+    Promise.resolve(localStorage.getItem("jwt")).then(jwtToken => {
+      return jwtToken === '' ? Promise.reject() : Promise.resolve(self.getUsers(jwtToken))
+    }).then(response => {
+      console.log("componentDidMount() - response: %o", response)
+      self.setState({
+        users: response.data
+      })
+    }).catch(error => {
+      console.log("componentDidMount() - error: %o", error);
+      self.setState({
+        users: []
       })
     })
-    .catch(error => console.log(error))
   }
 
+  getUsers(jwtToken) {
+    let token = "Bearer " + jwtToken
+    let authOptions = {
+      url: 'api/v1/users',
+      headers: {
+        'Authorization': token
+      }
+    };
+    
+    return axios(authOptions);
+  } 
+
   addNewUser(first_name, last_name, other_info) {
-    axios.post( '/api/v1/users', { user: {first_name, last_name, other_info} })
-    .then(response => {
+    this.props.getJWToken().then(jwtToken => {
+      let token, authOptions;
+
+      if (jwtToken === '') {
+        return Promise.reject()
+      } else {
+        token = "Bearer " + jwtToken
+        authOptions = {
+          url: '/api/v1/users/current',
+          method: 'PUT',
+          headers: {
+            'Authorization': token
+          },
+          data: { user: {first_name, last_name, other_info} }
+        };
+        return axios(authOptions)
+      }
+    }).then(response => {
       console.log(response)
       const users = [ ...this.state.users, response.data ]
       this.setState({users})
-    })
-    .catch(error => {
+    }).catch(error => {
       console.log(error)
     })
   }
 
   removeUser(id) {
-    axios.delete( '/api/v1/users/' + id )
-    .then(response => {
+    this.props.getJWToken().then(jwtToken => {
+      let token, authOptions;
+
+      if (jwtToken === '') {
+        return Promise.reject()
+      } else {
+        token = "Bearer " + jwtToken
+        authOptions = {
+          method: 'DELETE',
+          url: '/api/v1/user/' + id,
+          headers: {
+            'Authorization': token
+          }
+        };
+        return axios(authOptions)
+      }
+    }).then(response => {
       const users = this.state.users.filter(
         user => user.id !== id
       )
@@ -59,14 +109,30 @@ class UsersContainer extends Component {
   }
 
   editUser(id, first_name, last_name, other_info) {
-    axios.put( '/api/v1/users/' + id, { 
-      user: {
-        first_name, 
-        last_name,
-        other_info
-      } 
-    })
-    .then(response => {
+    this.props.getJWToken().then(jwtToken => {
+      let token, authOptions;
+
+      if (jwtToken === '') {
+        return Promise.reject()
+      } else {
+        token = "Bearer " + jwtToken
+        authOptions = {
+          method: 'PATCH',
+          url: '/api/v1/user/' + id,
+          data: { 
+            user: {
+              first_name, 
+              last_name,
+              other_info
+            }
+          },
+          headers: {
+            'Authorization': token
+          }
+        };
+        return axios(authOptions)
+      }
+    }).then(response => {
       console.log(response);
       const users = this.state.users;
       users[id-1] = {id, first_name, other_info}
@@ -74,10 +140,8 @@ class UsersContainer extends Component {
         users, 
         editingUserId: null
       }))
-    })
-    .catch(error => console.log(error));
+    }).catch(error => console.log(error));
   }
-
 
   render() {
     return (

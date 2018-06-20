@@ -5,9 +5,9 @@ class EditUserForm extends Component {
     super(props)
     this.state = {
       id: this.props.user.id,
-      first_name: this.props.user.title,
-      last_name: this.props.user.title,
-      other_info: this.props.user.excerpt
+      first_name: this.props.user.first_name,
+      last_name: this.props.user.last_name,
+      other_info: this.props.user.other_info
     }
     this.handleChange = this.handleChange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
@@ -20,7 +20,8 @@ class EditUserForm extends Component {
   handleSubmit(e){
     e.preventDefault();
     const { id, first_name, last_name, other_info } = this.state;
-    this.props.editList(id, first_name, last_name, other_info);
+    console.log(id, first_name, last_name, other_info)
+    this.props.editUser(id, first_name, last_name, other_info);
   }
   
   render() {

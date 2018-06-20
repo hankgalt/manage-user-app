@@ -2,59 +2,62 @@ import React, { Component } from 'react';
 import './App.css';
 import axios from 'axios';
 
-// import UsersContainer from './components/UsersContainer';
+import LoginForm from './components/LoginForm';
+import UsersContainer from './components/UsersContainer';
 
 class App extends Component {
 
   constructor(props) {
     super(props)
-    this.handleChange = this.handleChange.bind(this)
-    this.login = this.login.bind(this)
+
+    this.state = {
+      currentUser: null
+    }
+
+    this.logout = this.logout.bind(this)
+    this.updateCurrentUser = this.updateCurrentUser.bind(this)
   }
 
-  getUser() {
-    let token = "Bearer " + localStorage.getItem("jwt")
+  componentDidMount() {
+    let self = this;
+
+    this.getJWToken().then(jwtToken => {
+      return jwtToken === '' ? Promise.reject() : Promise.resolve(self.getUser(jwtToken))
+    }).then(response => {
+      self.updateCurrentUser(response.data);
+    }).catch(error => {
+      self.updateCurrentUser(null);
+    })
+  }
+
+  updateCurrentUser(user) {
+    this.setState({
+      currentUser: user
+    })
+  }
+
+  getJWToken() {
+    return Promise.resolve(localStorage.getItem("jwt"))
+  }
+
+  getUser(jwtToken) {
+    let token = "Bearer " + jwtToken
     let authOptions = {
       url: '/api/v1/users/current',
       headers: {
         'Authorization': token
       }
     };
-    console.log(token)
+    return axios(authOptions);
+  } 
 
-    axios(authOptions).then(function(response) {
-      console.log(response)
-      this.setState({usersReceived: JSON.stringify(response)})
-    }).catch(function(error){
-      console.log(error);
-    })
+  isLoggedIn() {
+    return this.state.currentUser !== null;
   }
 
-  handleChange = (e) => {
-    this.setState({[e.target.name]: e.target.value})
-  }
-
-  login(e) {
-    e.preventDefault();
-    const { email, password } = this.state;
-    const request = {"auth": {"email": email, "password": password}}
-    console.log(request)
-
-    var authOptions = {
-      method: 'POST',
-      url: '/api/v1/user_token',
-      data: request,
-      json: true
-    };
-
-    axios(authOptions)
-    .then(response => {
-      console.log(response)
-      localStorage.setItem("jwt", response.data.jwt)
-    })
-    .catch(error => {
-      console.log(error)
-    })
+  logout() {
+    localStorage.setItem("jwt", "");
+    this.updateCurrentUser(null);
   }
 
   render() {
@@ -62,17 +65,10 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <h1 className="App-title">Welcome to User Management</h1>
+          { this.isLoggedIn() ? <h1 className="App-title">{this.state.currentUser.first_name}</h1> : <h1 className="App-title"> Please sign-in </h1> }
+          { this.isLoggedIn() ? <button onClick={this.logout}> Logout </button> : null }
         </header>
-        <form>
-          <label htmlFor="email">Email: </label>
-          <input name="email" id="email" type="email" onChange={this.handleChange} />
-          <label htmlFor="password">Password:</label>
-          <input name="password" type="password" id="password" onChange={this.handleChange} />
-        </form>
-        <br />
-        <button onClick={this.login}> Login </button>
-        <br />
-        <button onClick={this.getUser}> Get Users </button>
+          { this.isLoggedIn() ? <UsersContainer getJWToken={this.getJWToken}/> : <LoginForm updateCurrentUser={this.updateCurrentUser}/> }
       </div>
     );
   }
