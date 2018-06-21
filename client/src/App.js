@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
-import axios from 'axios';
 
-import LoginForm from './components/LoginForm';
+import Client from './utils/Client';
+
+import SignUpLogin from './components/SignUpLogin';
 import UsersContainer from './components/UsersContainer';
 
 class App extends Component {
@@ -21,8 +22,8 @@ class App extends Component {
   componentDidMount() {
     let self = this;
 
-    this.getJWToken().then(jwtToken => {
-      return jwtToken === '' ? Promise.reject() : Promise.resolve(self.getUser(jwtToken))
+    Client.getJWToken().then(jwtToken => {
+      return Client.getData('/api/v1/users/current')
     }).then(response => {
       self.updateCurrentUser(response.data);
     }).catch(error => {
@@ -35,21 +36,6 @@ class App extends Component {
       currentUser: user
     })
   }
-
-  getJWToken() {
-    return Promise.resolve(localStorage.getItem("jwt"))
-  }
-
-  getUser(jwtToken) {
-    let token = "Bearer " + jwtToken
-    let authOptions = {
-      url: '/api/v1/users/current',
-      headers: {
-        'Authorization': token
-      }
-    };
-    return axios(authOptions);
-  } 
 
   isLoggedIn() {
     return this.state.currentUser !== null;
@@ -68,7 +54,7 @@ class App extends Component {
           { this.isLoggedIn() ? <h1 className="App-title">{this.state.currentUser.first_name}</h1> : <h1 className="App-title"> Please sign-in </h1> }
           { this.isLoggedIn() ? <button onClick={this.logout}> Logout </button> : null }
         </header>
-          { this.isLoggedIn() ? <UsersContainer getJWToken={this.getJWToken}/> : <LoginForm updateCurrentUser={this.updateCurrentUser}/> }
+          { this.isLoggedIn() ? <UsersContainer currentUser={this.state.currentUser}/> : <SignUpLogin updateCurrentUser={this.updateCurrentUser}/> }
       </div>
     );
   }
