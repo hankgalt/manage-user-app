@@ -18,12 +18,15 @@ body {
   border-right: 1px solid black;
 }
 
-.current-user {
+.admin {
   flex-basis: 50%;
 }
 
-.add-user {
+.admin-actions {
   flex-basis: 50%;
+  align-self: flex-end;
+  margin: 2px;
+  padding: 2px;
 }
 
 .data-pane {
@@ -45,43 +48,75 @@ body {
   padding: 2px;
   line-height: 1.5;
   border-bottom: 1px solid black;
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
 }
 
 .single-user:last-child { 
   border-bottom: none; 
 }
 
-.single-user:hover, .single-user.selected {
-  background-color: blue;
-  cursor: pointer;
+.single-user.selected {
+  background-color: #EEDCC7;
+}
+
+.actions, .user-actions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
+.user-actions {
+  flex-basis: 20%;
+  align-self: flex-end;
+}
+
+.actions {
+  justify-content: center;
+}
+
+.actions > button {
+  flex-basis: auto;
+  align-self: center;
+  margin: 1px;
+}
+
+.user-actions > button {
+  flex-basis: auto;
+  align-self: flex-end;
+  margin: 1px;
+}
+
+.user-info {
+  flex-basis: 80%;
+  align-self: flex-start;
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .user-details {
   flex-basis: 80%;
 }
 
-.user-detail-form {
+.landing-form {
   display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row;
+  flex-wrap: nowrap;
 }
 
-.form-input {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
+.form-spacer {
+  flex-basis: 10%;
 }
 
-input {
+.spacer-form {
   flex-basis: 80%;
-  align-self: flex-start;
-  margin: 2px;
 }
 
-label {
-  flex-basis: 20%;
-  align-self: flex-start;
-  text-align: right;
-  margin-right:15px;
+.user-detail-form, .login-form, .signup-form {
+  margin: 5px;
+  margin-right: 15px;
 }

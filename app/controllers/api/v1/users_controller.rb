@@ -1,11 +1,13 @@
 module Api::V1
   class UsersController < ApplicationController
-    before_action :authenticate_user
+    before_action :authenticate_user, :except => [:sign_up]
     before_action :set_user, only: [:show, :update, :destroy]
 
     # GET /users
     def index
-      @users = User.all
+      # @users = User.all
+
+      @users = User.where(admin_user_id: current_user.id)
 
       render json: @users
     end
@@ -13,6 +15,17 @@ module Api::V1
     # GET /users/1
     def show
       render json: @user
+    end
+
+    # POST /users
+    def sign_up
+      @user = User.new(user_params)
+
+      if @user.save
+        render json: @user, status: :created
+      else
+        render json: @user.errors, status: :unprocessable_entity
+      end
     end
 
     # POST /users
@@ -30,7 +43,7 @@ module Api::V1
     # PATCH/PUT /users/1
     def update
       @user = User.find(params[:id])
-      
+
       if @user.update(user_params)
         render json: @user
       else

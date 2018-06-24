@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { Form, FormGroup, FormControl, ControlLabel, Button, Col } from 'react-bootstrap';
+
 import Client from '../utils/Client';
 
 class SignUpLogin extends Component {
@@ -12,6 +14,10 @@ class SignUpLogin extends Component {
     this.handleChange = this.handleChange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.toggleView = this.toggleView.bind(this)
+    this.signUpForm = this.signUpForm.bind(this)
+    this.loginForm = this.loginForm.bind(this)
+    this.handleLogin = this.handleLogin.bind(this)
+    this.handleSignup = this.handleSignup.bind(this)
   }
 
   handleChange = (e) => {
@@ -21,7 +27,7 @@ class SignUpLogin extends Component {
   handleSubmit = (e) => {
     e.preventDefault()
 
-    if (e.target.name === 'login') {
+    if (this.state.viewState === 'login') {
       this.handleLogin()
     } else {
       this.handleSignup()
@@ -30,11 +36,11 @@ class SignUpLogin extends Component {
 
   handleLogin() {
     let self = this
-    const { email, password } = this.state
+    const { login, loginPassword } = this.state
     const authData = {
       auth: {
-        email: email, 
-        password: password
+        email: login, 
+        password: loginPassword
       }
     }
     
@@ -75,49 +81,81 @@ class SignUpLogin extends Component {
     })
   }
 
+  signUpForm() {
+    return (
+      <div className="spacer-form">
+        <Form name="signup" className="signup-form" horizontal>
+          <FormGroup controlId="formHorizontalFirstName">
+            <Col componentClass={ControlLabel} sm={2}>First name: </Col>
+            <Col sm={10}><FormControl name="first_name" type="text" onChange={this.handleChange} /></Col>
+          </FormGroup>
+
+          <FormGroup controlId="formHorizontalLastName">
+            <Col componentClass={ControlLabel} sm={2}>Last name: </Col>
+            <Col sm={10}><FormControl name="last_name" type="text" onChange={this.handleChange}/></Col>
+          </FormGroup>
+
+          <FormGroup controlId="formHorizontalEmail">
+            <Col componentClass={ControlLabel} sm={2}>Email</Col>
+            <Col sm={10}><FormControl name="email" type="email" onChange={this.handleChange}/></Col>
+          </FormGroup>
+
+          <FormGroup controlId="formHorizontalPassword">
+            <Col componentClass={ControlLabel} sm={2}>Password: </Col>
+            <Col sm={10}><FormControl name="password" type="password" onChange={this.handleChange}/></Col>
+          </FormGroup>
+
+          <FormGroup controlId="formHorizontalPasswordConfirmation">
+            <Col componentClass={ControlLabel} sm={2}>Password confirmation:</Col>
+            <Col sm={10}><FormControl name="password_confirmation" type="password" onChange={this.handleChange}/></Col>
+          </FormGroup>
+
+          <FormGroup>
+            <Col smOffset={2} sm={10}>
+              <div className="actions">
+                <Button type="submit" onClick={this.handleSubmit}>Sign up</Button>
+                <Button onClick={this.toggleView}>Click to log in</Button>
+              </div>
+            </Col>
+          </FormGroup>
+        </Form>
+      </div>
+    )
+  }
+
+  loginForm() {
+    return (
+      <div className="spacer-form">
+        <Form name="login" className="login-form" horizontal>
+          <FormGroup controlId="formHorizontalEmail">
+            <Col componentClass={ControlLabel} sm={2}>Email: </Col>
+            <Col sm={10}><FormControl name="login" type="email" onChange={this.handleChange} /></Col>
+          </FormGroup>
+
+          <FormGroup controlId="formHorizontalPassword">
+            <Col componentClass={ControlLabel} sm={2}>Password: </Col>
+            <Col sm={10}><FormControl name="loginPassword" type="password" onChange={this.handleChange}/></Col>
+          </FormGroup>
+
+          <FormGroup>
+            <Col smOffset={2} sm={10}>
+              <div className="actions">
+                <Button type="submit" onClick={this.handleSubmit}>Login</Button>
+                <Button onClick={this.toggleView}>Click to sign up</Button>
+              </div>
+            </Col>
+          </FormGroup>
+        </Form>
+      </div>
+    )
+  }
+
   render() {
     return (
-      <div>
-        { this.state.viewState === 'login' ? <form name="login" onSubmit={this.handleSubmit}>
-          <label htmlFor="email">
-            Email: 
-            <input name="email" id="email" type="email" onChange={this.handleChange} />
-          </label><br />
-          <label htmlFor="password">
-            Password:
-            <input name="password" id="password" type="password" onChange={this.handleChange} />
-          </label><br />
-          <input type="submit" value="Submit" />
-          <button onClick={this.toggleView}>Click to sign up</button>
-        </form> :
-        <form name="signup" onSubmit={this.handleSubmit}>
-          <label htmlFor="first_name">
-            First Name: 
-            <input name="first_name" id="first_name" type="text" onChange={this.handleChange} />
-          </label><br />
-          <label htmlFor="last_name">
-            Last name:
-            <input name="last_name" id="last_name" type="text" onChange={this.handleChange} />
-          </label><br />
-          <label htmlFor="email">
-            Email: 
-            <input name="email" id="email" type="email" onChange={this.handleChange} />
-          </label><br />
-          <label htmlFor="password">
-            Password:
-            <input name="password" id="password" type="password" onChange={this.handleChange} />
-          </label><br />
-          <label htmlFor="password_confirmation">
-            Password confirmation:
-            <input name="password_confirmation" id="password_confirmation" type="password" onChange={this.handleChange} />
-          </label><br />
-          <label htmlFor="other_info">
-            Other info:
-            <input name="other_info" id="other_info" type="text" onChange={this.handleChange} />
-          </label><br />
-          <input type="submit" value="Submit" />
-          <button onClick={this.toggleView}>Click to log in</button>
-        </form> }
+      <div className="landing-form">
+        <div className="form-spacer"></div>
+        { this.state.viewState === 'login' ? this.loginForm() : this.signUpForm() }
+        <div className="form-spacer"></div>
       </div>
     )
   }

@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
+import { Button } from 'react-bootstrap';
 
 import Client from '../utils/Client';
 import UserDetail from './UserDetail';
+import User from './User';
 
 class UsersContainer extends Component {
   constructor(props){
@@ -15,6 +17,8 @@ class UsersContainer extends Component {
     this.removeUser = this.removeUser.bind(this)
     this.editUser = this.editUser.bind(this)
     this.showDetails = this.showDetails.bind(this)
+    this.clearForm = this.clearForm.bind(this)
+    this.logout = this.logout.bind(this)
   }
 
   componentDidMount() {
@@ -49,6 +53,9 @@ class UsersContainer extends Component {
   removeUser(id) {
     let self = this
 
+    const errorMsg = 'id is a required field';
+    console.assert(Number.isInteger(parseInt(id, 0)), {errorMsg: errorMsg});
+
     Client.getData('/api/v1/user/' + id, { 
       method: 'DELETE' 
     }).then(response => {
@@ -80,10 +87,20 @@ class UsersContainer extends Component {
     });
   }
 
-  showDetails(event) {
-    const { id } = event.target;
+  clearForm() {
+    this.setState({
+      editingUser: null,
+      editingUserIndex: null
+    })
+  }
+
+  logout() {
+    this.props.logout();
+  }
+
+  showDetails(id) {
     let editingUserIndex = this.state.users.findIndex(user => { 
-      return user.id === parseInt(id, 0)
+      return user.id === id
     });
 
     this.setState({
@@ -100,20 +117,19 @@ class UsersContainer extends Component {
     return (
       <div className="users-pane">
         <div className="top-pane">
-          <span className="current-user" key={currentUser.id}>
-            {currentUser.first_name}, {currentUser.last_name}
+          <span className="admin" key={currentUser.id}>
+            {currentUser.first_name.toUpperCase()}, {currentUser.last_name.toUpperCase()}
           </span>
-          <span className="add-user">
-            <button onClick={this.showDetails}>Add New User</button>
+          <span className="admin-actions">
+            <Button bsSize="small" bsStyle="link" onClick={this.clearForm}>Add New User</Button>
+            <Button bsSize="small" bsStyle="link" onClick={this.logout}>Logout</Button>
           </span>
         </div>
         <div className="data-pane">
           <div className="user-list">
             { users.map( user => {
               return (
-                <div className={"single-user " + (editingUser && editingUser.id === user.id ? 'selected' : '')} id={user.id} key={user.id} onClick={this.showDetails}>
-                  {user.first_name}, {user.last_name}
-                </div>
+                <User user={user} editingUser={editingUser} removeUser={this.removeUser} showDetails={this.showDetails} key={user.id}></User>
               )
             })}
           </div>

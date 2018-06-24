@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Form, FormGroup, FormControl, ControlLabel, Button, Col } from 'react-bootstrap';
 
 class UserDetail extends Component {
   constructor(props) {
@@ -35,33 +36,32 @@ class UserDetail extends Component {
       this.props.addNewUser(first_name, last_name, email)
     }
   }
-  
+
   render() {
     return (
       <div className="user-details">
-        <form className="user-detail-form" onSubmit={this.handleSubmit}>
-          <div className="form-input">
-            <label htmlFor="first_name">
-              First Name: 
-              <input name="first_name" type="text" value={this.state.first_name} onChange={this.handleChange}/>
-            </label>
-          </div>
-          <div className="form-input">
-            <label htmlFor="last_name">
-              Last name:
-              <input name="last_name" type="text" value={this.state.last_name} onChange={this.handleChange}/>
-            </label>
-          </div>
-          <div className="form-input">
-            <label htmlFor="email">
-              Email: 
-              <input name="email" type="email" value={this.state.email} onChange={this.handleChange}/>
-            </label>
-          </div>
-          <div>
-            <input type="submit" value="Submit" />
-          </div>
-        </form> 
+        <Form className="user-detail-form" horizontal>
+          <FormGroup controlId="formHorizontal">
+            <Col componentClass={ControlLabel} sm={2}>First name: </Col>
+            <Col sm={10}><FormControl name="first_name" type="text" placeholder="first name" value={this.state.first_name} onChange={this.handleChange} /></Col>
+          </FormGroup>
+
+          <FormGroup controlId="formHorizontalEmail">
+            <Col componentClass={ControlLabel} sm={2}>Last name: </Col>
+            <Col sm={10}><FormControl name="last_name" type="text" placeholder="last name" value={this.state.last_name} onChange={this.handleChange}/></Col>
+          </FormGroup>
+
+          <FormGroup controlId="formHorizontalPassword">
+            <Col componentClass={ControlLabel} sm={2}>Email</Col>
+            <Col sm={10}><FormControl name="email" type="email" value={this.state.email} placeholder="email" onChange={this.handleChange}/></Col>
+          </FormGroup>
+
+          <FormGroup>
+            <Col smOffset={2} sm={10}>
+              <Button type="submit" onClick={this.handleSubmit}>Submit</Button>
+            </Col>
+          </FormGroup>
+        </Form>
       </div>
     )
   }

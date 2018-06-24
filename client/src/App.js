@@ -51,10 +51,8 @@ class App extends Component {
       <div className="App">
         <header className="App-header">
           <h1 className="App-title">Welcome to User Management</h1>
-          { this.isLoggedIn() ? <h1 className="App-title">{this.state.currentUser.first_name}</h1> : <h1 className="App-title"> Please sign-in </h1> }
-          { this.isLoggedIn() ? <button onClick={this.logout}> Logout </button> : null }
         </header>
-          { this.isLoggedIn() ? <UsersContainer currentUser={this.state.currentUser}/> : <SignUpLogin updateCurrentUser={this.updateCurrentUser}/> }
+        { this.isLoggedIn() ? <UsersContainer currentUser={this.state.currentUser} logout={this.logout}/> : <SignUpLogin updateCurrentUser={this.updateCurrentUser}/> }
       </div>
     );
   }
