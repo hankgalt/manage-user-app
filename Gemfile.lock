@@ -49,9 +49,11 @@ GEM
       minitest (~> 5.1)
       tzinfo (~> 1.1)
     arel (8.0.0)
+    awesome_print (1.8.0)
     bcrypt (3.1.12)
     builder (3.2.3)
     byebug (10.0.2)
+    coderay (1.1.2)
     concurrent-ruby (1.0.5)
     crass (1.0.4)
     erubi (1.7.1)
@@ -80,6 +82,9 @@ GEM
     nokogiri (1.8.3)
       mini_portile2 (~> 2.3.0)
     pg (1.0.0)
+    pry (0.11.3)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
     puma (3.11.4)
     rack (2.0.5)
     rack-cors (1.0.2)
@@ -137,12 +142,14 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  awesome_print
   bcrypt (= 3.1.12)
   byebug
   foreman (~> 0.85.0)
   knock!
   listen (>= 3.0.5, < 3.2)
   pg (>= 0.18, < 2.0)
+  pry
   puma (~> 3.7)
   rack-cors
   rails (~> 5.1.6)

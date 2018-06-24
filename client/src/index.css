@@ -9,10 +9,21 @@ body {
 }
 
 .top-pane {
+  display: flex;
+  flex-direction: row;
   width: auto;
+  text-align: right;
   border-top: 1px solid black;
   border-left: 1px solid black;
   border-right: 1px solid black;
+}
+
+.current-user {
+  flex-basis: 50%;
+}
+
+.add-user {
+  flex-basis: 50%;
 }
 
 .data-pane {
@@ -40,7 +51,7 @@ body {
   border-bottom: none; 
 }
 
-.single-user:hover {
+.single-user:hover, .single-user.selected {
   background-color: blue;
   cursor: pointer;
 }

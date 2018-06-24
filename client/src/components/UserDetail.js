@@ -11,26 +11,29 @@ class UserDetail extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.user) {
-      this.setState({
-        id: nextProps.user.id,
-        first_name: nextProps.user.first_name,
-        last_name: nextProps.user.last_name,
-        email: nextProps.user.email,
-        other_info: nextProps.user.other_info
-      })
-    }
+    this.setState({
+      id: nextProps.user ? nextProps.user.id : null,
+      first_name: nextProps.user ? nextProps.user.first_name : '',
+      last_name: nextProps.user ? nextProps.user.last_name : '',
+      email: nextProps.user ? nextProps.user.email : ''
+    })
   }
 
   handleChange = (e) => {
     this.setState({[e.target.name]: e.target.value})
   }
 
-  handleSubmit(e){
+  handleSubmit(e) {
     e.preventDefault();
-    const { id, first_name, last_name, email, other_info } = this.state;
-    console.log(id, first_name, last_name, email, other_info)
-    this.props.editUser(id, first_name, last_name, email, other_info)
+
+    // add validations
+
+    const { id, first_name, last_name, email } = this.state;
+    if (id) {
+      this.props.editUser(id, first_name, last_name, email)
+    } else {
+      this.props.addNewUser(first_name, last_name, email)
+    }
   }
   
   render() {
@@ -53,12 +56,6 @@ class UserDetail extends Component {
             <label htmlFor="email">
               Email: 
               <input name="email" type="email" value={this.state.email} onChange={this.handleChange}/>
-            </label>
-          </div>
-          <div className="form-input">
-            <label htmlFor="other_info">
-              Other info:
-              <input name="other_info" type="text" value={this.state.other_info} onChange={this.handleChange}/>
             </label>
           </div>
           <div>

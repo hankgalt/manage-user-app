@@ -18,9 +18,10 @@ module Api::V1
     # POST /users
     def create
       @user = User.new(user_params)
+      @user.admin_user_id = current_user.id
 
       if @user.save
-        render json: @user, status: :created, location: @user
+        render json: @user, status: :created
       else
         render json: @user.errors, status: :unprocessable_entity
       end
@@ -29,6 +30,7 @@ module Api::V1
     # PATCH/PUT /users/1
     def update
       @user = User.find(params[:id])
+      
       if @user.update(user_params)
         render json: @user
       else

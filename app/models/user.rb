@@ -2,11 +2,9 @@ class User < ApplicationRecord
   has_many :app_users, class_name: "User", foreign_key: "admin_user_id"
   belongs_to :admin_user, class_name: "User", optional: true
 
-  has_secure_password
+  has_secure_password :validations => false
 
-  before_validation { 
-    (self.email = self.email.to_s.downcase) 
-  }
+  before_save {email.downcase!}
 
   validates_presence_of     :email
   validates_uniqueness_of   :email

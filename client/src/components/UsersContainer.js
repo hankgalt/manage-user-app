@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 
 import Client from '../utils/Client';
-
-import NewUserForm from './NewUserForm';
 import UserDetail from './UserDetail';
 
 class UsersContainer extends Component {
@@ -10,11 +8,11 @@ class UsersContainer extends Component {
     super(props)
     this.state = {
       users: [],
-      editingUserId: null
+      editingUser: null,
+      editingUserIndex: null
     }
     this.addNewUser = this.addNewUser.bind(this)
     this.removeUser = this.removeUser.bind(this)
-    this.editingUser = this.editingUser.bind(this)
     this.editUser = this.editUser.bind(this)
     this.showDetails = this.showDetails.bind(this)
   }
@@ -24,7 +22,7 @@ class UsersContainer extends Component {
 
     Client.getData('api/v1/users').then(response => {
       self.setState({
-        users: response.data
+        users: response.data.filter(user => user.id !== this.props.currentUser.id)
       })
     }).catch(error => {
       self.setState({
@@ -33,48 +31,49 @@ class UsersContainer extends Component {
     })
   }
 
-  addNewUser(first_name, last_name, other_info) {
+  addNewUser(first_name, last_name, email) {
+    let self = this
+
     Client.getData('/api/v1/users/create', { 
-      method: 'PUT', 
-      data: { user: {first_name, last_name, other_info} } 
+      method: 'POST', 
+      data: { user: {first_name, last_name, email} } 
     }).then(response => {
       console.log(response)
-      const users = [ ...this.state.users, response.data ]
-      this.setState({users})
-    }).catch(error => {
-      console.log(error)
+      const users = [ ...self.state.users, response.data ]
+      self.setState({users})
+    }).catch((error, response) => {
+      console.log(error.response.data)
     })
   }
 
   removeUser(id) {
+    let self = this
+
     Client.getData('/api/v1/user/' + id, { 
       method: 'DELETE' 
     }).then(response => {
-      const users = this.state.users.filter(
+      const users = self.state.users.filter(
         user => user.id !== id
       )
-      this.setState({users})
+      self.setState({users})
     }).catch(error => {
       console.log(error)
     })
   }
 
-  editingUser(id) {
-    this.setState({
-      editingUserId: id
-    })
-  }
+  editUser(id, first_name, last_name, email) {
+    let self = this
 
-  editUser(id, first_name, last_name, email, other_info) {
     Client.getData('/api/v1/user/' + id, { 
       method: 'PATCH',
-      data: { user: { first_name, last_name, email, other_info } }
+      data: { user: { first_name, last_name, email } }
     }).then(response => {
-      const users = this.state.users;
-      users[id] = {id, first_name, last_name, email, other_info}
-      this.setState(() => ({
+      const users = self.state.users;
+      users[self.state.editingUserIndex] = {id, first_name, last_name, email}
+      self.setState(() => ({
         users, 
-        editingUserId: null
+        editingUser: null,
+        editingUserIndex: null
       }))
     }).catch(error => {
       console.log(error)
@@ -83,31 +82,42 @@ class UsersContainer extends Component {
 
   showDetails(event) {
     const { id } = event.target;
+    let editingUserIndex = this.state.users.findIndex(user => { 
+      return user.id === parseInt(id, 0)
+    });
+
     this.setState({
-      editingUserId: parseInt(id, 0)
+      editingUser: id ? this.state.users[editingUserIndex] : null,
+      editingUserIndex: id ? editingUserIndex : null
     })
   }
 
   render() {
-    let selectedUser = this.state.users.find(x => { return x.id === this.state.editingUserId });
+    let currentUser = this.props.currentUser
+    let editingUser = this.state.editingUser
+    let users = this.state.users
+
     return (
       <div className="users-pane">
         <div className="top-pane">
-          <div className="current-user" key={this.props.currentUser.id}>
-            {this.props.currentUser.first_name}, {this.props.currentUser.last_name}
-          </div>
+          <span className="current-user" key={currentUser.id}>
+            {currentUser.first_name}, {currentUser.last_name}
+          </span>
+          <span className="add-user">
+            <button onClick={this.showDetails}>Add New User</button>
+          </span>
         </div>
         <div className="data-pane">
           <div className="user-list">
-            { this.state.users.map( user => {
+            { users.map( user => {
               return (
-                <div className="single-user" id={user.id} key={user.id} onClick={this.showDetails}>
+                <div className={"single-user " + (editingUser && editingUser.id === user.id ? 'selected' : '')} id={user.id} key={user.id} onClick={this.showDetails}>
                   {user.first_name}, {user.last_name}
                 </div>
               )
             })}
           </div>
-          <UserDetail user={selectedUser} editUser={this.editUser}/>
+          <UserDetail user={editingUser} editUser={this.editUser} addNewUser={this.addNewUser}/>
         </div>
       </div>
     )
