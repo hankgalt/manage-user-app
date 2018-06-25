@@ -120,3 +120,11 @@ body {
   margin: 5px;
   margin-right: 15px;
 }
+
+.form-messages {
+  color: #3A8614;
+}
+
+.form-errors {
+  color: #E1694D;
+}

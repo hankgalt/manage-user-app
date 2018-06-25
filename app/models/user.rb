@@ -6,12 +6,35 @@ class User < ApplicationRecord
 
   before_save {email.downcase!}
 
-  validates_presence_of     :email
-  validates_uniqueness_of   :email
+  VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i
+  validates :email, presence: true, length: { maximum: 255 }, format: { with: VALID_EMAIL_REGEX }, uniqueness: { case_sensitive: false }
 
-  # validates_presence_of :admin_user, :unless => :role == 'admin'
+  validates_presence_of :first_name, length: {maximum: 50}
+  validates_presence_of :last_name, length: {maximum: 50}
+
+  validate :password_match
+ 
+  def password_match
+    if password.present?
+      if !@password_confirmation.present?
+        errors.add(:password_confirmation, "missing")
+      elsif password != @password_confirmation
+        errors.add(:password_confirmation, "mismatch")
+      end
+    else
+      if role == 'admin'
+        errors.add(:password, "is required")
+      end
+    end
+  end
 
   def is_admin?
     role == 'admin'
+  end
+
+  private
+
+  def before_create_callback
+    binding.pry
   end
 end

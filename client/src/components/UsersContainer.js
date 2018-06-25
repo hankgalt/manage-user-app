@@ -24,7 +24,7 @@ class UsersContainer extends Component {
   componentDidMount() {
     let self = this;
 
-    Client.getData('api/v1/users').then(response => {
+    Client.api('api/v1/users').then(response => {
       self.setState({
         users: response.data.filter(user => user.id !== this.props.currentUser.id)
       })
@@ -38,15 +38,13 @@ class UsersContainer extends Component {
   addNewUser(first_name, last_name, email) {
     let self = this
 
-    Client.getData('/api/v1/users/create', { 
+    return Client.api('/api/v1/users/create', { 
       method: 'POST', 
       data: { user: {first_name, last_name, email} } 
     }).then(response => {
-      console.log(response)
       const users = [ ...self.state.users, response.data ]
       self.setState({users})
-    }).catch((error, response) => {
-      console.log(error.response.data)
+      return Promise.resolve(response)
     })
   }
 
@@ -54,9 +52,9 @@ class UsersContainer extends Component {
     let self = this
 
     const errorMsg = 'id is a required field';
-    console.assert(Number.isInteger(parseInt(id, 0)), {errorMsg: errorMsg});
+    console.assert(Number.isInteger(id), {errorMsg: errorMsg});
 
-    Client.getData('/api/v1/user/' + id, { 
+    Client.api('/api/v1/user/' + id, { 
       method: 'DELETE' 
     }).then(response => {
       const users = self.state.users.filter(
@@ -71,7 +69,7 @@ class UsersContainer extends Component {
   editUser(id, first_name, last_name, email) {
     let self = this
 
-    Client.getData('/api/v1/user/' + id, { 
+    return Client.api('/api/v1/user/' + id, { 
       method: 'PATCH',
       data: { user: { first_name, last_name, email } }
     }).then(response => {
@@ -82,9 +80,8 @@ class UsersContainer extends Component {
         editingUser: null,
         editingUserIndex: null
       }))
-    }).catch(error => {
-      console.log(error)
-    });
+      return Promise.resolve(response)
+    })
   }
 
   clearForm() {

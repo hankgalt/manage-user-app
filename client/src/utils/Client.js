@@ -1,13 +1,13 @@
 import axios from 'axios';
 
-function getJWToken() {
+function JWToken() {
   return Promise.resolve(localStorage.getItem("jwt"))
 }
 
-function getData(url, options) {
+function api(url, options) {
   let authOptions = Object.assign({ url: url, method: 'GET' }, options)
 
-  return getJWToken().then(jwtToken => {
+  return JWToken().then(jwtToken => {
     if (jwtToken === '') {
       return Promise.reject(Error('Missing auth-token, needs login'))
     } else { 
@@ -18,7 +18,20 @@ function getData(url, options) {
   })
 }
 
-function getToken(authData) {
+function signup(data) {
+  let authOptions = {
+    method: 'POST',
+    url: '/api/v1/users/sign_up',
+    data: data,
+    json: true
+  };
+
+  return axios(authOptions).catch(error => {
+    return Promise.reject(error)
+  })
+}
+
+function token(authData) {
   let authOptions = {
     method: 'POST',
     url: '/api/v1/user_token',
@@ -35,7 +48,8 @@ function getToken(authData) {
 }
 
 export default {
-  getJWToken,
-  getToken,
-  getData
+  JWToken,
+  token,
+  api,
+  signup
 };

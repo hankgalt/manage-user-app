@@ -22,8 +22,8 @@ class App extends Component {
   componentDidMount() {
     let self = this;
 
-    Client.getJWToken().then(jwtToken => {
-      return Client.getData('/api/v1/users/current')
+    Client.JWToken().then(jwtToken => {
+      return Client.api('/api/v1/users/current')
     }).then(response => {
       self.updateCurrentUser(response.data);
     }).catch(error => {

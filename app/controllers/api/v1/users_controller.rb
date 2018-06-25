@@ -5,8 +5,6 @@ module Api::V1
 
     # GET /users
     def index
-      # @users = User.all
-
       @users = User.where(admin_user_id: current_user.id)
 
       render json: @users
@@ -20,6 +18,7 @@ module Api::V1
     # POST /users
     def sign_up
       @user = User.new(user_params)
+      @user.role = 'admin'
 
       if @user.save
         render json: @user, status: :created
@@ -62,7 +61,7 @@ module Api::V1
     end
 
     def current
-      current_user.update!(last_login: Time.now)
+      current_user.update_columns(last_login: Time.now)
       render json: current_user
     end
 

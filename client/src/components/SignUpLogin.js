@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { Form, FormGroup, FormControl, ControlLabel, Button, Col } from 'react-bootstrap';
 
 import Client from '../utils/Client';
+import FormComponent from './FormComponent';
 
 class SignUpLogin extends Component {
   constructor(props) {
@@ -11,67 +11,52 @@ class SignUpLogin extends Component {
       viewState: 'login'
     }
 
-    this.handleChange = this.handleChange.bind(this)
-    this.handleSubmit = this.handleSubmit.bind(this)
     this.toggleView = this.toggleView.bind(this)
     this.signUpForm = this.signUpForm.bind(this)
     this.loginForm = this.loginForm.bind(this)
     this.handleLogin = this.handleLogin.bind(this)
     this.handleSignup = this.handleSignup.bind(this)
+
+    this.loginForm = this.loginForm.bind(this)
   }
 
-  handleChange = (e) => {
-    this.setState({[e.target.name]: e.target.value})
-  }
-
-  handleSubmit = (e) => {
-    e.preventDefault()
-
-    if (this.state.viewState === 'login') {
-      this.handleLogin()
-    } else {
-      this.handleSignup()
-    }
-  }
-
-  handleLogin() {
+  handleLogin(formData) {
     let self = this
-    const { login, loginPassword } = this.state
     const authData = {
       auth: {
-        email: login, 
-        password: loginPassword
+        email: formData.login, 
+        password: formData.loginPassword
       }
     }
     
-    Client.getToken(authData).then(jwtToken => {
-      return Client.getData('/api/v1/users/current')
+    return Client.token(authData).then(jwtToken => {
+      return Client.api('/api/v1/users/current')
     }).then(response => {
       self.props.updateCurrentUser(response.data);
+      return Promise.resolve(response)
     }).catch(error => {
       self.props.updateCurrentUser(null);
+      return Promise.reject(error)
     })
   }
 
-  handleSignup() {
-    const { first_name, last_name, email, password, password_confirmation } = this.state
+  handleSignup(formData) {
+    let self = this
     const data = {
       user: {
-        first_name, 
-        last_name,
-        email, 
-        password,
-        password_confirmation
+        first_name: formData.first_name, 
+        last_name: formData.last_name,
+        email: formData.email, 
+        password: formData.password,
+        password_confirmation: formData.password_confirmation
       }
     }
 
-    Client.getData('/api/v1/users/create', { 
-      method: 'PUT', 
-      data: data 
-    }).then(response => {
-      console.log(response)
-    }).catch(error => {
-      console.log(error)
+    return Client.signup(data).then(response => {
+      self.setState({
+        viewState: 'login'
+      })
+      return Promise.resolve(response)
     })
   }
 
@@ -82,70 +67,80 @@ class SignUpLogin extends Component {
   }
 
   signUpForm() {
+    let formOptions = {
+      formName: "signup",
+      formClassName: "signup-form",
+      formOnSubmit: this.handleSignup,
+      buttonActionLabel: "Sign up",
+      additionalActionLabel: "Click here to login",
+      fields: [
+        {
+          name: "first_name",
+          type: "text",
+          label: "First name: ",
+          required: true
+        },
+        {
+          name: "last_name",
+          type: "text",
+          label: "Last name: ",
+          required: true
+        },
+        {
+          name: "email",
+          type: "email",
+          label: "Email: ",
+          required: true
+        },
+        {
+          name: "password",
+          type: "password",
+          label: "Password: ",
+          required: true
+        },
+        {
+          name: "password_confirmation",
+          type: "password",
+          label: "Password confirmation: ",
+          required: true
+        }
+      ],
+      additionalAction: this.toggleView
+    }
+
     return (
       <div className="spacer-form">
-        <Form name="signup" className="signup-form" horizontal>
-          <FormGroup controlId="formHorizontalFirstName">
-            <Col componentClass={ControlLabel} sm={2}>First name: </Col>
-            <Col sm={10}><FormControl name="first_name" type="text" onChange={this.handleChange} /></Col>
-          </FormGroup>
-
-          <FormGroup controlId="formHorizontalLastName">
-            <Col componentClass={ControlLabel} sm={2}>Last name: </Col>
-            <Col sm={10}><FormControl name="last_name" type="text" onChange={this.handleChange}/></Col>
-          </FormGroup>
-
-          <FormGroup controlId="formHorizontalEmail">
-            <Col componentClass={ControlLabel} sm={2}>Email</Col>
-            <Col sm={10}><FormControl name="email" type="email" onChange={this.handleChange}/></Col>
-          </FormGroup>
-
-          <FormGroup controlId="formHorizontalPassword">
-            <Col componentClass={ControlLabel} sm={2}>Password: </Col>
-            <Col sm={10}><FormControl name="password" type="password" onChange={this.handleChange}/></Col>
-          </FormGroup>
-
-          <FormGroup controlId="formHorizontalPasswordConfirmation">
-            <Col componentClass={ControlLabel} sm={2}>Password confirmation:</Col>
-            <Col sm={10}><FormControl name="password_confirmation" type="password" onChange={this.handleChange}/></Col>
-          </FormGroup>
-
-          <FormGroup>
-            <Col smOffset={2} sm={10}>
-              <div className="actions">
-                <Button type="submit" onClick={this.handleSubmit}>Sign up</Button>
-                <Button onClick={this.toggleView}>Click to log in</Button>
-              </div>
-            </Col>
-          </FormGroup>
-        </Form>
+        <FormComponent formOptions={formOptions}></FormComponent>
       </div>
     )
   }
 
   loginForm() {
+    let formOptions = {
+      formName: "login",
+      formClassName: "login-form",
+      formOnSubmit: this.handleLogin,
+      buttonActionLabel: "Login",
+      additionalActionLabel: "Click here to sign up",
+      fields: [
+        {
+          name: "login",
+          type: "email",
+          label: "Email: ",
+          required: true
+        },
+        {
+          name: "loginPassword",
+          type: "password",
+          label: "Password: ",
+          required: true
+        }
+      ],
+      additionalAction: this.toggleView
+    }
     return (
       <div className="spacer-form">
-        <Form name="login" className="login-form" horizontal>
-          <FormGroup controlId="formHorizontalEmail">
-            <Col componentClass={ControlLabel} sm={2}>Email: </Col>
-            <Col sm={10}><FormControl name="login" type="email" onChange={this.handleChange} /></Col>
-          </FormGroup>
-
-          <FormGroup controlId="formHorizontalPassword">
-            <Col componentClass={ControlLabel} sm={2}>Password: </Col>
-            <Col sm={10}><FormControl name="loginPassword" type="password" onChange={this.handleChange}/></Col>
-          </FormGroup>
-
-          <FormGroup>
-            <Col smOffset={2} sm={10}>
-              <div className="actions">
-                <Button type="submit" onClick={this.handleSubmit}>Login</Button>
-                <Button onClick={this.toggleView}>Click to sign up</Button>
-              </div>
-            </Col>
-          </FormGroup>
-        </Form>
+        <FormComponent formOptions={formOptions}></FormComponent>
       </div>
     )
   }
