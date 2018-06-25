@@ -42,7 +42,7 @@ class UsersContainer extends Component {
   }
 
   componentWillUnmount() {
-    //
+    // unregister stomp topics
   }
 
   addNewUser(first_name, last_name, email) {

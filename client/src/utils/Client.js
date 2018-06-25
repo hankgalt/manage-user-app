@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { SockJS } from 'sockjs-client';
-import { Stomp } from 'stompjs';
+// import { SockJS } from 'sockjs-client';
+// import { Stomp } from 'stompjs';
 
 function JWToken() {
   return Promise.resolve(localStorage.getItem("jwt"))
@@ -49,21 +49,21 @@ function token(authData) {
   })
 }
 
-function register(registrations) {
-  let socket = SockJS('/users') 
-  let stompClient = Stomp.over(socket)
-  stompClient.connect({}, () = frame => {
-    for (let registration of registrations) {
-      console.log(registration);
-      stompClient.subscribe(registration.route, registration.callback);
-    }
-  });
-}
+// function register(registrations) {
+//   let socket = SockJS('/users') 
+//   let stompClient = Stomp.over(socket)
+//   stompClient.connect({}, () = frame => {
+//     for (let registration of registrations) {
+//       console.log(registration);
+//       stompClient.subscribe(registration.route, registration.callback);
+//     }
+//   });
+// }
 
 export default {
   JWToken,
   token,
   api,
-  signup,
-  register
+  // register,
+  signup
 };
