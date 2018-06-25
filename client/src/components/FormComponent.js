@@ -18,13 +18,14 @@ class FormComponent extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    let state = this.state
     let formData = nextProps.formOptions.fields.map(field => field.name ).reduce((o, k) => { 
 
       let formField = nextProps.formOptions.fields.find(field => { 
         return field.name === k
       });
 
-      o[k] = formField.value; 
+      o[k] = formField.value || state[k] || null; 
       return o; 
     }, {});
     this.setState(Object.assign(formData, {
@@ -57,10 +58,12 @@ class FormComponent extends Component {
     formOptions.formOnSubmit(formData).then(response => {
       console.log(response)
       self.setState({
-        messages: ["Update successfully"]
+        messages: ["Update successfully"],
+        errors: null
       })
     }).catch((error) => {
       self.setState({
+        messages: null,
         errors: self.buildErrors(error)
       })
     })
