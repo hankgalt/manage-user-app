@@ -56,7 +56,6 @@ class FormComponent extends Component {
     }, {});
 
     formOptions.formOnSubmit(formData).then(response => {
-      console.log(response)
       self.setState({
         messages: ["Update successfully"],
         errors: null

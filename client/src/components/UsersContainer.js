@@ -25,6 +25,12 @@ class UsersContainer extends Component {
     let self = this;
 
     Client.api('api/v1/users').then(response => {
+      // Client.register([
+      //   {route: '/topic/newUser', callback: this.refreshAndGoToLastPage},
+      //   {route: '/topic/updateUser', callback: this.refreshCurrentPage},
+      //   {route: '/topic/deleteUser', callback: this.refreshCurrentPage}
+      // ]);
+
       self.setState({
         users: response.data.filter(user => user.id !== this.props.currentUser.id)
       })
@@ -33,6 +39,10 @@ class UsersContainer extends Component {
         users: []
       })
     })
+  }
+
+  componentWillUnmount() {
+    //
   }
 
   addNewUser(first_name, last_name, email) {
